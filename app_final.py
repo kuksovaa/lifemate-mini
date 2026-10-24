@@ -134,3 +134,28 @@ def add_person(person: PersonEntry):
     logger.info('Person created')
 
     return people[name]
+
+
+# напоминание о встречах 
+@app.get('/reminders')
+def get_reminders(days: int = 30):
+
+    today = date.today()
+    reminders = []
+
+    for person in people.values():
+
+        last_meeting = date.fromisoformat(person['last_meeting'])
+
+        days_since = (today - last_meeting).days
+
+        if days_since >= days: 
+            reminders.append({
+                'name': person['name'], 
+                'days_since_meeting': days_since,
+                'message': f'Вы не виделись {days_since} дней. Может пора встретиться?'
+            })
+
+    logger.info('Reminders requested')
+
+    return {'reminders': reminders}
