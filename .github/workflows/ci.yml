@@ -30,10 +30,15 @@ jobs:
           mkdir -p reports
           uv run --locked python -m pytest -v --junitxml=reports/pytest-results.xml
 
-      - name: Upload test report
-        if: always()
+      - name: Upload LifeMate artifact
         uses: actions/upload-artifact@v7
         with:
-          name: lifemate-test-report
-          path: reports/pytest-results.xml
-          if-no-files-found: warn
+          name: lifemate-artifact
+          path: |
+            app_final.py
+            test_app.py
+            requirements.txt
+            requirements-dev.txt
+            README.md
+            reports/pytest-results.xml
+          if-no-files-found: error
