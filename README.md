@@ -47,8 +47,6 @@ git clone https://github.com/kuksovaa/lifemate-mini.git
 cd lifemate-mini
 ```
 
-Ссылка на клонирование станет рабочей после публикации репозитория.
-
 Установить зависимости:
 
 ```bash
