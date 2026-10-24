@@ -1,7 +1,7 @@
 # импорт необходимых библиотек
 import os  
 import logging                                      # модуль для записи логов 
-from fastapi import FastAPI, HTTPException          # создание веб-приложения и возврата HTTP-ошибки
+from fastapi import FastAPI, HTTPException, Query   # создание веб-приложения и возврата HTTP-ошибки
 from pydantic import BaseModel, Field               # проверка входящих данных
 from datetime import datetime, date                 # для фиксации даты записей дневника
 
@@ -61,7 +61,7 @@ def add_journal(entry: JournalEntry):
     new_entry = {
         'id': len(journal) + 1, 
         'text': entry.text,
-        'created_at': datetime.now().astimezone().isoformat(timespec='seconds'),
+        'created_at': now.isoformat(timespec='seconds'),
         'event_date': event_date.isoformat() if event_date else None
     }
 
@@ -138,7 +138,7 @@ def add_person(person: PersonEntry):
 
 # напоминание о встречах 
 @app.get('/reminders')
-def get_reminders(days: int = 30):
+def get_reminders(days: int = Query(default=30, ge=1)):
 
     today = date.today()
     reminders = []
@@ -159,3 +159,30 @@ def get_reminders(days: int = 30):
     logger.info('Reminders requested')
 
     return {'reminders': reminders}
+
+# рекомендации по интересам 
+
+ideas = {
+    'музыка': ['Сходить на концерт', 'Посетить музыкальный фестиваль'],
+    'театр': ['Посмотреть новую постановку', 'Посетить камерный театр'],
+    'спорт': ['Попробовать новый вид спорта', 'Сходить на тренировку'],
+    'путешествия': ['Спланировать поездку на выходные'],
+    'кино': ['Посмотреть фильм в кинотеатре']
+}
+
+
+@app.get('/ideas/{interest}')
+def get_ideas(interest: str):
+    interest = interest.strip().lower()
+
+    if interest not in ideas: 
+        raise HTTPException(
+            status_code = 404, 
+            detail = 'Interest not found'
+        )
+    logger.info('Ideas requested: %s', interest)
+
+    return {
+        'interest': interest, 
+        'recommendations': ideas[interest]
+    }
